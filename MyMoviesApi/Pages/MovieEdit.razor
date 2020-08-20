@@ -1,0 +1,64 @@
+﻿@using MyMoviesApi.Data
+@page "/MovieEdit/{Id:int}"
+@inject HttpClient Http
+@inject Microsoft.AspNetCore.Components.NavigationManager NavigationManager
+
+<h2>Edit</h2>
+<h4>Movies</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form>
+            <div class="form-group">
+                <label for="Name" class="control-label">Name</label>
+                <input for="Name" class="form-control" bind="@movie.Name" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Gender" class="control-label">Genre</label>
+                <select asp-for="Gender" class="form-control" bind="@movie.Genre">
+                    <option value="">-- Select Gender --</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label asp-for="Department" class="control-label">MyRating</label>
+                <input asp-for="Department" class="form-control" bind="@movie.MyRating" />
+            </div>
+            <div class=" form-group">
+                <label asp-for="City" class="control-label">Rating</label>
+                <input asp-for="City" class="form-control" bind="@movie.Rating" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" @onclick="@(async () => await UpdateMovie())" class="btn btn-default" />
+                @*<input type="submit" value="Cancel" @onclick="Cancel" class="btn" />*@
+            </div>
+        </form>
+
+        <button class="btn" @onclick="Cancel">Cancel</button>
+    </div>
+</div>
+
+@functions
+{
+    [Parameter] 
+    public int id { get; set; }
+
+    Movie movie = new Movie();
+
+    protected override async Task OnInitializedAsync()
+    {
+        movie = await Http.GetJsonAsync<Movie>("/api/Movie/Details/" + id);
+    }
+
+    protected async Task UpdateMovie()
+    {
+        await Http.SendJsonAsync(HttpMethod.Put, "api/Movie/Edit", movie); 
+        NavigationManager.NavigateTo("/Movies");
+    }
+
+    void Cancel()
+    {
+        NavigationManager.NavigateTo("/Movies", true);
+    }
+}
